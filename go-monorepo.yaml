@@ -1,0 +1,16 @@
+build:
+  targets:
+    - name: "app:fizzbuzz"
+      path: "apps/fizzbuzz"
+      jobs:
+        - name: "build"
+      props:
+        goarch: "amd64"
+        goos: "linux"
+    - name: "app:helloworld"
+      path: "apps/helloworld"
+      jobs:
+        - name: "build"
+      props:
+        goarch: "amd64"
+        goos: "linux"
