@@ -4,4 +4,5 @@ use (
 	./apps/fizzbuzz
 	./apps/helloworld
 	./pkgs/fmt
+	./monorepo
 )

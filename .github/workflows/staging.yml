@@ -1,0 +1,38 @@
+name: Staging
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.detect.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v5
+      - run: go version
+      - name: Detect Changes
+        id: detect
+        run: |
+          set -e
+          targets=$(go run ./monorepo/cmd/gha-job-matrix)
+          echo "matrix={\"target\":$targets}" >> "$GITHUB_OUTPUT"
+  build:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+      - run: go version
+      - run: mkdir -p bin
+      - run: ${{ matrix.target.build }}

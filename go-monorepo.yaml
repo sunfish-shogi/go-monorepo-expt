@@ -1,0 +1,18 @@
+gha:
+  targets:
+    - name: "app:fizzbuzz"
+      path: "apps/fizzbuzz"
+      jobs:
+        - name: "build"
+      props:
+        build: "go build -o bin/fizzbuzz ./apps/fizzbuzz"
+        goarch: "amd64"
+        goos: "linux"
+    - name: "app:helloworld"
+      path: "apps/helloworld"
+      jobs:
+        - name: "build"
+      props:
+        build: "go build -o bin/helloworld ./apps/helloworld"
+        goarch: "amd64"
+        goos: "linux"
