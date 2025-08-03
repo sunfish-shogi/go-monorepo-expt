@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"os"
 	"path/filepath"
+
+	"github.com/goccy/go-yaml"
 
 	detector "github.com/sunfish-shogi/go-change-detector"
 	"golang.org/x/mod/modfile"
@@ -32,9 +35,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for _, pkg := range changedPackages {
-		println(pkg.Dir)
+
+	config, err := readMonorepoConfig(filepath.Join(*gitRootPath, "go-monorepo.yaml"))
+	if err != nil {
+		panic(err)
 	}
+
+	paths := make([]string, 0, len(config.GHA.Targets))
+	for _, target := range config.GHA.Targets {
+		cleanedPath := filepath.Clean(target.Path)
+		for _, pkgPath := range changedPackages {
+			cleanedPkgPath := filepath.Clean(pkgPath.Dir)
+			if cleanedPkgPath == cleanedPath {
+				paths = append(paths, cleanedPath)
+			}
+		}
+	}
+	output, err := json.Marshal(paths)
+	if err != nil {
+		panic(err)
+	}
+	println(string(output))
 }
 
 func readWorkspace(goWorkPath string) ([]string, error) {
@@ -54,4 +75,35 @@ func readWorkspace(goWorkPath string) ([]string, error) {
 	}
 	// FIXME: support replace-directives
 	return goModulePaths, nil
+}
+
+type GoMonorepoConfig struct {
+	GHA `yaml:"gha"`
+}
+
+type GHA struct {
+	Targets []BuildTarget `yaml:"targets"`
+}
+
+type BuildTarget struct {
+	Name  string            `yaml:"name"`
+	Path  string            `yaml:"path"`
+	Jobs  []Job             `yaml:"jobs,omitempty"`
+	Props map[string]string `yaml:"props,omitempty"`
+}
+
+type Job struct {
+	Name string `yaml:"name"`
+}
+
+func readMonorepoConfig(path string) (*GoMonorepoConfig, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var config GoMonorepoConfig
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, err
+	}
+	return &config, nil
 }

@@ -1,4 +1,4 @@
-build:
+gha:
   targets:
     - name: "app:fizzbuzz"
       path: "apps/fizzbuzz"
