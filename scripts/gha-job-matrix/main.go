@@ -41,17 +41,24 @@ func main() {
 		panic(err)
 	}
 
-	paths := make([]string, 0, len(config.GHA.Targets))
+	targets := make([]map[string]string, 0, len(config.GHA.Targets))
 	for _, target := range config.GHA.Targets {
 		cleanedPath := filepath.Clean(target.Path)
 		for _, pkgPath := range changedPackages {
 			cleanedPkgPath := filepath.Clean(pkgPath.Dir)
 			if cleanedPkgPath == cleanedPath {
-				paths = append(paths, cleanedPath)
+				props := make(map[string]string, len(target.Props)+2)
+				props["name"] = target.Name
+				props["path"] = target.Path
+				for k, v := range target.Props {
+					props[k] = v
+				}
+				targets = append(targets, props)
+				break
 			}
 		}
 	}
-	output, err := json.Marshal(paths)
+	output, err := json.Marshal(targets)
 	if err != nil {
 		panic(err)
 	}
