@@ -5,7 +5,7 @@ gha:
       jobs:
         - name: "build"
       props:
-        build: "go build ./apps/fizzbuzz -o bin/fizzbuzz"
+        build: "go build -o bin/fizzbuzz ./apps/fizzbuzz"
         goarch: "amd64"
         goos: "linux"
     - name: "app:helloworld"
@@ -13,6 +13,6 @@ gha:
       jobs:
         - name: "build"
       props:
-        build: "go build ./apps/helloworld -o bin/helloworld"
+        build: "go build -o bin/helloworld ./apps/helloworld"
         goarch: "amd64"
         goos: "linux"
