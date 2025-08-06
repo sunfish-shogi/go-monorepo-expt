@@ -12,7 +12,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      targets: ${{ steps.detect.outputs.targets }}
+      matrix: ${{ steps.detect.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,15 +24,15 @@ jobs:
         run: |
           set -e
           targets=$(go run ./scripts/gha-job-matrix)
-          echo "targets=$targets" >> "$GITHUB_OUTPUT"
+          echo "matrix={\"target\":$targets}" >> "$GITHUB_OUTPUT"
   build:
     needs: detect-changes
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.detect-changes.outputs.targets) }}
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
       - run: go version
       - run: mkdir -p bin
-      - run: ${{ matrix.build }}
+      - run: ${{ matrix.target.build }}

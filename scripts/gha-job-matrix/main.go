@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 
@@ -49,11 +50,9 @@ func main() {
 			cleanedPkgPath := filepath.Clean(pkgPath.Dir)
 			if cleanedPkgPath == cleanedPath {
 				props := make(map[string]string, len(target.Props)+2)
+				maps.Copy(props, target.Props)
 				props["name"] = target.Name
 				props["path"] = target.Path
-				for k, v := range target.Props {
-					props[k] = v
-				}
 				targets = append(targets, props)
 				break
 			}
