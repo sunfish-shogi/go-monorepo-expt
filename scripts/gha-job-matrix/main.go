@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -62,7 +63,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	println(string(output))
+	fmt.Println(string(output))
 }
 
 func readWorkspace(goWorkPath string) ([]string, error) {
