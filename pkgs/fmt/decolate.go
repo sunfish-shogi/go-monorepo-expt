@@ -14,10 +14,10 @@ func Highlight(text string) string {
 		}
 	}
 	var result strings.Builder
-	result.WriteString(strings.Repeat("*", maxLen+4) + "\n")
+	result.WriteString(strings.Repeat("^", maxLen+4) + "\n")
 	for _, l := range line {
-		result.WriteString("* " + l + strings.Repeat(" ", maxLen-len(l)) + " *\n")
+		result.WriteString("< " + l + strings.Repeat(" ", maxLen-len(l)) + " >\n")
 	}
-	result.WriteString(strings.Repeat("*", maxLen+4) + "\n")
+	result.WriteString(strings.Repeat("v", maxLen+4) + "\n")
 	return result.String()
 }
