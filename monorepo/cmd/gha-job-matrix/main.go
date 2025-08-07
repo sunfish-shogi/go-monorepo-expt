@@ -7,6 +7,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 
 	detector "github.com/sunfish-shogi/go-change-detector"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo"
@@ -42,24 +43,51 @@ func main() {
 		panic(err)
 	}
 
-	targets := make([]map[string]string, 0, len(config.GHA.Targets))
+	jobNames := make(map[string]struct{})
+	changedTargets := make([]monorepo.BuildTarget, 0, len(config.GHA.Targets))
 	for _, target := range config.GHA.Targets {
+		for _, job := range target.Jobs {
+			jobNames[job.Name] = struct{}{}
+		}
 		cleanedPath := filepath.Clean(target.Path)
 		for _, pkgPath := range changedPackages {
 			cleanedPkgPath := filepath.Clean(pkgPath.Dir)
 			if cleanedPkgPath == cleanedPath {
-				props := make(map[string]string, len(target.Props)+2)
-				maps.Copy(props, target.Props)
-				props["name"] = target.Name
-				props["path"] = target.Path
-				targets = append(targets, props)
+				changedTargets = append(changedTargets, target)
 				break
 			}
 		}
 	}
-	output, err := json.Marshal(targets)
-	if err != nil {
-		panic(err)
+
+	for jobName := range jobNames {
+		matrixItems := make([]MatrixItem, 0, len(changedTargets))
+		for _, target := range changedTargets {
+			if slices.ContainsFunc(target.Jobs, func(job monorepo.Job) bool {
+				return job.Name == jobName
+			}) {
+				matrixItems = append(matrixItems, newMatrixItem(target))
+			}
+		}
+		matrix := Matrix{Targets: matrixItems}
+		jsonData, err := json.Marshal(matrix)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%s_matrix=%s\n", jobName, jsonData)
+		fmt.Printf("needs_%s=%t\n", jobName, len(matrixItems) > 0)
 	}
-	fmt.Println(string(output))
+}
+
+type MatrixItem map[string]any
+
+type Matrix struct {
+	Targets []MatrixItem `json:"targets"`
+}
+
+func newMatrixItem(target monorepo.BuildTarget) MatrixItem {
+	item := make(MatrixItem, len(target.Props)+2)
+	maps.Copy(item, target.Props)
+	item["id"] = target.ID
+	item["path"] = target.Path
+	return item
 }

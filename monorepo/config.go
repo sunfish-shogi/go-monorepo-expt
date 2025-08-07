@@ -15,10 +15,10 @@ type GHA struct {
 }
 
 type BuildTarget struct {
-	Name  string            `yaml:"name"`
-	Path  string            `yaml:"path"`
-	Jobs  []Job             `yaml:"jobs,omitempty"`
-	Props map[string]string `yaml:"props,omitempty"`
+	ID    string         `yaml:"id"`
+	Path  string         `yaml:"path"`
+	Jobs  []Job          `yaml:"jobs,omitempty"`
+	Props map[string]any `yaml:"props,omitempty"`
 }
 
 type Job struct {

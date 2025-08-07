@@ -1,18 +1,20 @@
 gha:
   targets:
-    - name: "app:fizzbuzz"
+    - id: "pkgs"
+      path: "pkgs/fmt"
+      jobs:
+        - name: "test"
+      props:
+        test: "go test ./pkgs/fmt"
+    - id: "fizzbuzz"
       path: "apps/fizzbuzz"
       jobs:
         - name: "build"
       props:
         build: "go build -o bin/fizzbuzz ./apps/fizzbuzz"
-        goarch: "amd64"
-        goos: "linux"
-    - name: "app:helloworld"
+    - id: "helloworld"
       path: "apps/helloworld"
       jobs:
         - name: "build"
       props:
         build: "go build -o bin/helloworld ./apps/helloworld"
-        goarch: "amd64"
-        goos: "linux"
