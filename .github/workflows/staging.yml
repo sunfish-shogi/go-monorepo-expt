@@ -24,7 +24,7 @@ jobs:
       - run: go version
       - name: Detect Changes
         id: detect
-        run: go run ./monorepo/cmd/gha-job-matrix) >> "$GITHUB_OUTPUT"
+        run: go run ./monorepo/cmd/gha-job-matrix >> "$GITHUB_OUTPUT"
   test:
     needs: detect-changes
     if: needs.detect-changes.outputs.needs_test == 'true'
@@ -37,7 +37,9 @@ jobs:
       - run: go version
       - run: ${{ matrix.target.test }}
   build:
-    needs: detect-changes
+    needs:
+      - detect-changes
+      - test
     if: needs.detect-changes.outputs.needs_build == 'true'
     runs-on: ubuntu-latest
     strategy:
