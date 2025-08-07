@@ -68,7 +68,7 @@ func main() {
 				matrixItems = append(matrixItems, newMatrixItem(target))
 			}
 		}
-		matrix := Matrix{Targets: matrixItems}
+		matrix := Matrix{Target: matrixItems}
 		jsonData, err := json.Marshal(matrix)
 		if err != nil {
 			panic(err)
@@ -81,7 +81,7 @@ func main() {
 type MatrixItem map[string]any
 
 type Matrix struct {
-	Targets []MatrixItem `json:"targets"`
+	Target []MatrixItem `json:"target"`
 }
 
 func newMatrixItem(target monorepo.BuildTarget) MatrixItem {
