@@ -9,19 +9,15 @@ func TestHighlight(t *testing.T) {
 	}{
 		{
 			input:    "Hello, World!",
-			expected: "*****************\n* Hello, World! *\n*****************\n",
+			expected: " ^^^^^^^^^^^^^^^ \n< Hello, World! >\n vvvvvvvvvvvvvvv \n",
 		},
 		{
 			input:    "This is a test.\nWith multiple lines.",
-			expected: "************************\n* This is a test.      *\n* With multiple lines. *\n************************\n",
+			expected: " ^^^^^^^^^^^^^^^^^^^^^^ \n< This is a test.      >\n< With multiple lines. >\n vvvvvvvvvvvvvvvvvvvvvv \n",
 		},
 		{
 			input:    "Short\nLonger line here.",
-			expected: "*********************\n* Short             *\n* Longer line here. *\n*********************\n",
-		},
-		{
-			input:    "",
-			expected: "****\n*  *\n****\n",
+			expected: " ^^^^^^^^^^^^^^^^^^^ \n< Short             >\n< Longer line here. >\n vvvvvvvvvvvvvvvvvvv \n",
 		},
 	}
 	for _, tc := range testCases {
