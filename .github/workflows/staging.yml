@@ -39,7 +39,6 @@ jobs:
   build:
     needs:
       - detect-changes
-      - test
     if: needs.detect-changes.outputs.needs_build == 'true'
     runs-on: ubuntu-latest
     strategy:
