@@ -19,6 +19,10 @@ func TestHighlight(t *testing.T) {
 			input:    "Short\nLonger line here.",
 			expected: "*********************\n* Short             *\n* Longer line here. *\n*********************\n",
 		},
+		{
+			input:    "",
+			expected: "****\n*  *\n****\n",
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
