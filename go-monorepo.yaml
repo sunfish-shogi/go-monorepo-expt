@@ -9,6 +9,7 @@ gha:
     - id: "fizzbuzz"
       path: "apps/fizzbuzz"
       jobs:
+        - name: "test"
         - name: "build"
       props:
         build: "go build -o bin/fizzbuzz ./apps/fizzbuzz"

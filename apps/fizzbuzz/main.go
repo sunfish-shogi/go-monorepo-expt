@@ -8,8 +8,12 @@ import (
 )
 
 func main() {
+	print(fmt.Highlight(strings.TrimSpace(fizzBuzz(15))))
+}
+
+func fizzBuzz(n int) string {
 	sb := strings.Builder{}
-	for i := 1; i <= 15; i++ {
+	for i := 1; i <= n; i++ {
 		if i%3 == 0 && i%5 == 0 {
 			sb.WriteString("FizzBuzz\n")
 		} else if i%3 == 0 {
@@ -20,5 +24,5 @@ func main() {
 			sb.WriteString(strconv.Itoa(i) + "\n")
 		}
 	}
-	print(fmt.Highlight(strings.TrimSpace(sb.String())))
+	return sb.String()
 }
