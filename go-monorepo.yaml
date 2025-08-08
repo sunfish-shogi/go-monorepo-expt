@@ -12,6 +12,7 @@ gha:
         - name: "test"
         - name: "build"
       props:
+        test: "go test ./apps/fizzbuzz"
         build: "go build -o bin/fizzbuzz ./apps/fizzbuzz"
     - id: "helloworld"
       path: "apps/helloworld"
