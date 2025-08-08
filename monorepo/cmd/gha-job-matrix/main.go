@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"maps"
 	"os"
 	"path/filepath"
@@ -18,6 +19,7 @@ func main() {
 	gitRootPath := flag.String("git-root", ".", "Path to the git root directory")
 	goWorkPath := flag.String("go-work", "go.work", "Path to the go.work file")
 	baseCommit := flag.String("base-commit", "HEAD~", "Base commit to compare against")
+	appendGitHubOutput := flag.Bool("append-github-output", false, "Append GitHub output")
 	flag.Parse()
 
 	if gitDir, err := os.Lstat(filepath.Join(*gitRootPath, ".git")); err != nil || !gitDir.IsDir() {
@@ -59,6 +61,18 @@ func main() {
 		}
 	}
 
+	out := io.Writer(os.Stdout)
+
+	if *appendGitHubOutput {
+		gitHubOutputPath := os.Getenv("GITHUB_OUTPUT")
+		file, err := os.OpenFile(gitHubOutputPath, os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(fmt.Errorf("failed to open GITHUB_OUTPUT file: %w", err))
+		}
+		defer file.Close()
+		out = io.MultiWriter(os.Stdout, file)
+	}
+
 	for jobName := range jobNames {
 		matrixItems := make([]MatrixItem, 0, len(changedTargets))
 		for _, target := range changedTargets {
@@ -73,8 +87,8 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s_matrix=%s\n", jobName, jsonData)
-		fmt.Printf("needs_%s=%t\n", jobName, len(matrixItems) > 0)
+		fmt.Fprintf(out, "%s_matrix=%s\n", jobName, jsonData)
+		fmt.Fprintf(out, "needs_%s=%t\n", jobName, len(matrixItems) > 0)
 	}
 }
 

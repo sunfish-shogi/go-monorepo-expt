@@ -20,21 +20,22 @@ jobs:
       needs_build: ${{ steps.detect.outputs.needs_build }}
       build_matrix: ${{ steps.detect.outputs.build_matrix }}
     env:
-      BASE_REF: ${{ github.base_ref != '' && format('origin/{0}', github.base_ref) || 'HEAD~' }}
+      BASE_REF: ${{ github.base_ref != '' && format('origin/{0}', github.base_ref) || github.event.before }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # since HEAD~
       - uses: actions/setup-go@v5
+      - name: Show Base Ref
+        run: echo "$BASE_REF"
       - name: Fetch Base Branch
         if: github.event_name == 'pull_request'
         run: git fetch origin ${{ github.base_ref }}
-      - run: go version
+      - name: Show Go Version
+        run: go version
       - name: Detect Changes
         id: detect
-        run: |
-          set -euxo pipefail
-          go run ./monorepo/cmd/gha-job-matrix -base-commit $BASE_REF | tee "$GITHUB_OUTPUT"
+        run: go run ./monorepo/cmd/gha-job-matrix -base-commit $BASE_REF -append-github-output
   test:
     needs: detect-changes
     if: needs.detect-changes.outputs.needs_test == 'true'
