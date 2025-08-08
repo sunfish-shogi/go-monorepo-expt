@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   detect-changes:
@@ -16,15 +19,22 @@ jobs:
       test_matrix: ${{ steps.detect.outputs.test_matrix }}
       needs_build: ${{ steps.detect.outputs.needs_build }}
       build_matrix: ${{ steps.detect.outputs.build_matrix }}
+    env:
+      BASE_REF: ${{ github.base_ref != '' && format('origin/{0}', github.base_ref) || 'HEAD~' }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 2 # since HEAD~
       - uses: actions/setup-go@v5
+      - name: Fetch Base Branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin ${{ github.base_ref }}
       - run: go version
       - name: Detect Changes
         id: detect
-        run: go run ./monorepo/cmd/gha-job-matrix | tee "$GITHUB_OUTPUT"
+        run: |
+          set -euxo pipefail
+          go run ./monorepo/cmd/gha-job-matrix -base-commit $BASE_REF | tee "$GITHUB_OUTPUT"
   test:
     needs: detect-changes
     if: needs.detect-changes.outputs.needs_test == 'true'
