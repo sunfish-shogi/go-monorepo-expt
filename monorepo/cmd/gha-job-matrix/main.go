@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"slices"
 
-	detector "github.com/sunfish-shogi/go-change-detector"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo"
+	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/detect"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/golang"
 )
 
@@ -32,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	changedPackages, err := detector.DetectChangedPackages(context.Background(), &detector.Config{
+	changedPackages, err := detect.DetectChangedPackages(context.Background(), &detect.Config{
 		GitRootPath:   *gitRootPath,
 		BaseCommit:    *baseCommit,
 		GoModulePaths: goModulePaths,
@@ -41,7 +41,7 @@ func main() {
 		panic(err)
 	}
 
-	config, err := monorepo.ReadMonorepoConfig(filepath.Join(*gitRootPath, "go-mono.yaml"))
+	config, err := monorepo.ReadRepoConfig(filepath.Join(*gitRootPath, monorepo.RepoConfigFileName))
 	if err != nil {
 		panic(err)
 	}

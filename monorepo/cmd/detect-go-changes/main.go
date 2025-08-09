@@ -5,16 +5,16 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/detect"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/git"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/golang"
-	detector "github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/changes"
 )
 
 func main() {
 	baseCommit := "HEAD~"
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--help" || os.Args[1] == "-h" {
-			println("Usage: go-change-detector [base-commit]")
+			println("Usage: detect-go-change [base-commit]")
 			return
 		}
 		baseCommit = os.Args[1]
@@ -34,7 +34,7 @@ func main() {
 		goModulePaths[i] = filepath.Dir(goModPath)
 	}
 
-	changedPackages, err := detector.DetectChangedPackages(context.Background(), &detector.Config{
+	changedPackages, err := detect.DetectChangedPackages(context.Background(), &detect.Config{
 		GitRootPath:   gitRootPath,
 		BaseCommit:    baseCommit,
 		GoModulePaths: goModulePaths,
