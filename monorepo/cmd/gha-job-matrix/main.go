@@ -41,7 +41,7 @@ func main() {
 		panic(err)
 	}
 
-	config, err := monorepo.ReadMonorepoConfig(filepath.Join(*gitRootPath, "go-monorepo.yaml"))
+	config, err := monorepo.ReadMonorepoConfig(filepath.Join(*gitRootPath, "go-mono.yaml"))
 	if err != nil {
 		panic(err)
 	}
