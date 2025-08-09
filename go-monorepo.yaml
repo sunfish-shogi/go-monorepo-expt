@@ -6,6 +6,12 @@ gha:
         - name: "test"
       props:
         test: "go test ./pkgs/fmt"
+    - id: "embed"
+      path: "apps/embed"
+      jobs:
+        - name: "build"
+      props:
+        build: "go build -o bin/embed ./apps/embed"
     - id: "fizzbuzz"
       path: "apps/fizzbuzz"
       jobs:
