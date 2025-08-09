@@ -12,6 +12,12 @@ gha:
         - name: "build"
       props:
         build: "go build -o bin/embed ./apps/embed"
+    - id: "extradep"
+      path: "apps/extradep"
+      jobs:
+        - name: "build"
+      props:
+        build: "make -C ./apps/extradep"
     - id: "fizzbuzz"
       path: "apps/fizzbuzz"
       jobs:

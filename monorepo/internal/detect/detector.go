@@ -88,7 +88,9 @@ func (cd *changeDetector) detectChangedPackages() ([]Package, error) {
 	// Filter packages that have changed
 	var changedPackages = make(map[string]*packages.Package)
 	for _, goPackage := range goPackages {
-		if cd.isPackageChanged(goPackage) {
+		if changed, err := cd.isPackageChanged(goPackage); err != nil {
+			return nil, err
+		} else if changed {
 			changedPackages[goPackage.PkgPath] = goPackage
 		}
 	}
@@ -121,27 +123,29 @@ func (cd *changeDetector) detectChangedPackages() ([]Package, error) {
 	return results, nil
 }
 
-func (cd *changeDetector) isPackageChanged(goPackage *packages.Package) bool {
-	pkgConfigPath := filepath.Join(goPackage.Dir, config.PackageConfigFileName)
-	pkgConfig, err := config.ReadPackageConfig(pkgConfigPath)
-	if err != nil {
-		return false
-	}
-	extraDependencies := make([]string, 0, len(pkgConfig.ExtraDependencies))
-	for _, dep := range pkgConfig.ExtraDependencies {
-		extraDependencies = append(extraDependencies, filepath.Join(goPackage.Dir, dep))
-	}
-
+func (cd *changeDetector) isPackageChanged(goPackage *packages.Package) (bool, error) {
 	files := goPackage.GoFiles
 	files = append(files, goPackage.OtherFiles...)
 	files = append(files, goPackage.EmbedFiles...)
-	files = append(files, extraDependencies...)
+
+	pkgConfigPath := filepath.Join(goPackage.Dir, config.PackageConfigFileName)
+	pkgConfig, err := config.ReadPackageConfig(pkgConfigPath)
+	if err == nil {
+		extraDependencies := make([]string, 0, len(pkgConfig.ExtraDependencies))
+		for _, dep := range pkgConfig.ExtraDependencies {
+			extraDependencies = append(extraDependencies, filepath.Join(goPackage.Dir, dep))
+		}
+		files = append(files, extraDependencies...)
+	} else if !os.IsNotExist(err) {
+		return false, fmt.Errorf("failed to read package config %s: %w", pkgConfigPath, err)
+	}
+
 	for _, filePath := range files {
 		if _, exists := cd.changedFiles[filePath]; exists {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 func (cd *changeDetector) isModuleUpdated(goPackage *packages.Package, changedPackages map[string]*packages.Package) (bool, error) {

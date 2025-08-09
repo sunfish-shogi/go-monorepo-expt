@@ -2,9 +2,9 @@ go 1.24.5
 
 use (
 	./apps/embed
+	./apps/extradep
 	./apps/fizzbuzz
 	./apps/helloworld
-	./apps/maketest
 	./monorepo
 	./pkgs/fmt
 )

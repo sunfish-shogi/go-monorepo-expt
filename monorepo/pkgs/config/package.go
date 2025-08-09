@@ -9,7 +9,7 @@ import (
 const PackageConfigFileName = "go-mono-pkg.yaml"
 
 type PackageConfig struct {
-	ExtraDependencies []string `yaml:"extra_dependencies,omitempty"`
+	ExtraDependencies []string `yaml:"extraDependencies,omitempty"`
 }
 
 func ReadPackageConfig(path string) (*PackageConfig, error) {

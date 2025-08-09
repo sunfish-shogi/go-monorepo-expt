@@ -1,4 +1,4 @@
-module github.com/sunfish-shogi/go-monorepo-expt/apps/maketest
+module github.com/sunfish-shogi/go-monorepo-expt/apps/extradep
 
 go 1.24.5
 
