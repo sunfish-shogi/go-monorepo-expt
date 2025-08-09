@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -31,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	changedPackages, err := detector.DetectChangedPackages(&detector.Config{
+	changedPackages, err := detector.DetectChangedPackages(context.Background(), &detector.Config{
 		GitRootPath:   *gitRootPath,
 		BaseCommit:    *baseCommit,
 		GoModulePaths: goModulePaths,
