@@ -4,6 +4,7 @@ use (
 	./apps/embed
 	./apps/fizzbuzz
 	./apps/helloworld
+	./apps/maketest
 	./monorepo
 	./pkgs/fmt
 )

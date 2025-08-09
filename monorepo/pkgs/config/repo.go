@@ -1,4 +1,4 @@
-package monorepo
+package config
 
 import (
 	"os"
@@ -6,7 +6,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-type GoMonorepoConfig struct {
+const RepoConfigFileName = "go-mono.yaml"
+
+type RepoConfig struct {
 	GHA `yaml:"gha"`
 }
 
@@ -25,12 +27,12 @@ type Job struct {
 	Name string `yaml:"name"`
 }
 
-func ReadMonorepoConfig(path string) (*GoMonorepoConfig, error) {
+func ReadRepoConfig(path string) (*RepoConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	var config GoMonorepoConfig
+	var config RepoConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, err
 	}

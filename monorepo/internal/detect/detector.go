@@ -11,6 +11,7 @@ import (
 
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/git"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/golang"
+	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/pkgs/config"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/module"
 	"golang.org/x/tools/go/packages"
@@ -121,9 +122,20 @@ func (cd *changeDetector) detectChangedPackages() ([]Package, error) {
 }
 
 func (cd *changeDetector) isPackageChanged(goPackage *packages.Package) bool {
+	pkgConfigPath := filepath.Join(goPackage.Dir, config.PackageConfigFileName)
+	pkgConfig, err := config.ReadPackageConfig(pkgConfigPath)
+	if err != nil {
+		return false
+	}
+	extraDependencies := make([]string, 0, len(pkgConfig.ExtraDependencies))
+	for _, dep := range pkgConfig.ExtraDependencies {
+		extraDependencies = append(extraDependencies, filepath.Join(goPackage.Dir, dep))
+	}
+
 	files := goPackage.GoFiles
 	files = append(files, goPackage.OtherFiles...)
 	files = append(files, goPackage.EmbedFiles...)
+	files = append(files, extraDependencies...)
 	for _, filePath := range files {
 		if _, exists := cd.changedFiles[filePath]; exists {
 			return true

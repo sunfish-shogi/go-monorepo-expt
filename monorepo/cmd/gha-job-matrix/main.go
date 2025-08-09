@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/sunfish-shogi/go-monorepo-expt/monorepo"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/detect"
 	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/internal/golang"
+	"github.com/sunfish-shogi/go-monorepo-expt/monorepo/pkgs/config"
 )
 
 func main() {
@@ -41,14 +41,14 @@ func main() {
 		panic(err)
 	}
 
-	config, err := monorepo.ReadRepoConfig(filepath.Join(*gitRootPath, monorepo.RepoConfigFileName))
+	repoConfig, err := config.ReadRepoConfig(filepath.Join(*gitRootPath, config.RepoConfigFileName))
 	if err != nil {
 		panic(err)
 	}
 
 	jobNames := make(map[string]struct{})
-	changedTargets := make([]monorepo.BuildTarget, 0, len(config.GHA.Targets))
-	for _, target := range config.GHA.Targets {
+	changedTargets := make([]config.BuildTarget, 0, len(repoConfig.GHA.Targets))
+	for _, target := range repoConfig.GHA.Targets {
 		for _, job := range target.Jobs {
 			jobNames[job.Name] = struct{}{}
 		}
@@ -77,7 +77,7 @@ func main() {
 	for jobName := range jobNames {
 		matrixItems := make([]MatrixItem, 0, len(changedTargets))
 		for _, target := range changedTargets {
-			if slices.ContainsFunc(target.Jobs, func(job monorepo.Job) bool {
+			if slices.ContainsFunc(target.Jobs, func(job config.Job) bool {
 				return job.Name == jobName
 			}) {
 				matrixItems = append(matrixItems, newMatrixItem(target))
@@ -99,7 +99,7 @@ type Matrix struct {
 	Target []MatrixItem `json:"target"`
 }
 
-func newMatrixItem(target monorepo.BuildTarget) MatrixItem {
+func newMatrixItem(target config.BuildTarget) MatrixItem {
 	item := make(MatrixItem, len(target.Props)+2)
 	maps.Copy(item, target.Props)
 	item["id"] = target.ID
