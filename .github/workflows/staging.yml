@@ -23,13 +23,10 @@ jobs:
       BASE_REF: ${{ github.base_ref != '' && format('origin/{0}', github.base_ref) || github.event.before }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # since HEAD~
       - uses: actions/setup-go@v5
       - name: Show Base Ref
         run: echo "$BASE_REF"
       - name: Fetch Base Branch
-        if: github.event_name == 'pull_request'
         run: git fetch origin ${{ github.base_ref }}
       - name: Show Go Version
         run: go version
