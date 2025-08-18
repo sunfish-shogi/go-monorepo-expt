@@ -1,7 +1,8 @@
 name: Prepare Release
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 on:
   workflow_dispatch:
@@ -30,18 +31,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-go@v5
       - name: Show Go Version
         run: go version
-      - name: Show Current Version
-        run: cat ./apps/${{ inputs.app }}/VERSION
       - name: Bump Version
-        run: go run ./monorepo/cmd/bump-version/main.go ./apps/${{ inputs.app }}/VERSION ${{ inputs.version }}
-      - name: Show Diff
-        run: git diff
+        run: |
+          VERSION_FILE="./apps/${{ inputs.app }}/VERSION"
+          go run ./monorepo/cmd/bump-version/main.go $VERSION_FILE ${{ inputs.version }}
+          echo "VERSION=$(cat $VERSION_FILE)" >> $GITHUB_ENV
       - name: Git Config
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Commit Changes
         run: git commit -am "Bump version to ${{ inputs.version }}"
+      - name: Push Changes
+        run: |
+          BRANCH="release-${{ inputs.app }}-$VERSION"
+          git branch -m $BRANCH
+          git push origin $BRANCH
+      - name: Create Pull Request
+        run: |
+          gh pr create \
+            --base main \
+            --head $BRANCH \
+            --title "Release $VERSION" \
+            --body "This PR releases version $VERSION of ${{ inputs.app }}."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
