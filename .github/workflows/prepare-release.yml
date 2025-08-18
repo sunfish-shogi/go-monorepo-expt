@@ -36,7 +36,7 @@ jobs:
       - name: Show Current Version
         run: cat ./apps/${{ inputs.app }}/VERSION
       - name: Bump Version
-        run: go run ./cmd/bump-version/main.go ./apps/${{ inputs.app }}/VERSION ${{ inputs.version }}
+        run: go run ./monorepo/cmd/bump-version/main.go ./apps/${{ inputs.app }}/VERSION ${{ inputs.version }}
       - name: Show Diff
         run: git diff
       - name: Commit Changes
