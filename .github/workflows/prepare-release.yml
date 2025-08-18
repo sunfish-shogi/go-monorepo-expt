@@ -49,7 +49,7 @@ jobs:
         run: git commit -am "Bump version to ${{ inputs.version }}"
       - name: Push Changes
         run: |
-          BRANCH="release-${{ inputs.app }}-$VERSION"
+          echo "BRANCH=release-${{ inputs.app }}-$VERSION" >> $GITHUB_ENV
           git branch -m $BRANCH
           git push origin $BRANCH
       - name: Create Pull Request
