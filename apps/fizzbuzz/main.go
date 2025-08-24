@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	print(fmt.Highlight(strings.TrimSpace(fizzBuzz(15))))
+	print(fmt.Highlight(strings.TrimSpace(fizzBuzz(20))))
 }
 
 func fizzBuzz(n int) string {
