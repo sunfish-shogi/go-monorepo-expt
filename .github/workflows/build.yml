@@ -20,7 +20,7 @@ jobs:
       needs_build: ${{ steps.detect.outputs.needs_build }}
       build_matrix: ${{ steps.detect.outputs.build_matrix }}
     env:
-      BASE_REF: ${{ github.base_ref != '' && format('origin/{0}', github.base_ref) || github.event.before }}
+      BASE_REF: ${{ github.base_ref != '' && format('remotes/origin/{0}', github.base_ref) || github.event.before }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
