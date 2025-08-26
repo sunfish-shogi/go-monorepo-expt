@@ -20,14 +20,17 @@ jobs:
       needs_build: ${{ steps.detect.outputs.needs_build }}
       build_matrix: ${{ steps.detect.outputs.build_matrix }}
     env:
+      BASE_BRANCH: ${{ github.base_ref != '' && github.base_ref || github.event.before }}
       BASE_REF: ${{ github.base_ref != '' && format('remotes/origin/{0}', github.base_ref) || github.event.before }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
+      - name: Show Base Branch
+        run: echo $BASE_BRANCH
       - name: Show Base Ref
         run: echo $BASE_REF
       - name: Fetch Base Branch
-        run: git fetch origin $(git rev-parse $BASE_REF)
+        run: git fetch origin $BASE_BRANCH
       - name: Show Go Version
         run: go version
       - name: Detect Changes
