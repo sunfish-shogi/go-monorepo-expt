@@ -1,0 +1,6 @@
+{
+  "apps/embed": "0.0.1",
+  "apps/extradep": "0.0.1",
+  "apps/fizzbuzz": "0.0.1",
+  "apps/helloworld": "0.0.1"
+}
